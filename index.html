@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>วันนี้กินอะไรดี?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kanit:wght@600;800&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-wood: #2B2420;
+    --bg-wood-deep: #1D1815;
+    --paper: #F5E6C8;
+    --paper-light: #FAF3E3;
+    --chili: #C1432E;
+    --chili-dark: #8F2E1F;
+    --turmeric: #E8A33D;
+    --herb: #6B8F53;
+    --ink: #2B2420;
+    --cream-text: #F5EDE0;
+    --cream-text-muted: #C9BBA3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg-wood: #201B18;
+      --bg-wood-deep: #16120F;
+      --paper: #F1E1BE;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg-wood: #201B18;
+    --bg-wood-deep: #16120F;
+    --paper: #F1E1BE;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg-wood);
+    background-image:
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.08) 0px, rgba(0,0,0,0.08) 1px, transparent 1px, transparent 42px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 2px, transparent 2px, transparent 6px);
+    color: var(--cream-text);
+    font-family: 'Sarabun', 'Segoe UI', sans-serif;
+    min-height: 100vh;
+    padding: 32px 16px 64px;
+  }
+
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .eyebrow {
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    color: var(--turmeric);
+    margin: 0 0 6px;
+  }
+
+  h1 {
+    font-family: 'Kanit', sans-serif;
+    font-weight: 800;
+    font-size: clamp(32px, 6vw, 52px);
+    line-height: 1.15;
+    margin: 0 0 10px;
+    color: var(--paper-light);
+  }
+
+  .sub {
+    font-size: 16px;
+    color: var(--cream-text-muted);
+    max-width: 480px;
+    margin: 0 auto;
+    line-height: 1.6;
+  }
+
+  .board {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    align-items: start;
+  }
+
+  @media (max-width: 720px) {
+    .board { grid-template-columns: 1fr; }
+  }
+
+  .panel {
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 6px;
+    padding: 28px;
+    position: relative;
+    box-shadow: 0 18px 0 -8px rgba(0,0,0,0.35);
+  }
+
+  .panel::before {
+    content: "";
+    position: absolute;
+    top: -8px; left: 24px; right: 24px;
+    height: 8px;
+    background: repeating-linear-gradient(90deg, var(--bg-wood) 0 10px, transparent 10px 20px);
+    opacity: 0.5;
+  }
+
+  .field { margin-bottom: 22px; }
+  .field:last-child { margin-bottom: 0; }
+
+  label.field-label {
+    display: block;
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 10px;
+    color: var(--ink);
+  }
+
+  select {
+    width: 100%;
+    font-family: 'Sarabun', sans-serif;
+    font-size: 16px;
+    padding: 12px 14px;
+    border-radius: 4px;
+    border: 2px solid var(--ink);
+    background: var(--paper-light);
+    color: var(--ink);
+    appearance: none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+    background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+  }
+
+  .choice-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .choice {
+    position: relative;
+  }
+
+  .choice input {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  .choice span {
+    display: inline-block;
+    padding: 9px 16px;
+    border-radius: 999px;
+    border: 2px solid var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+    background: var(--paper-light);
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .choice input:checked + span {
+    background: var(--chili);
+    border-color: var(--chili-dark);
+    color: var(--paper-light);
+  }
+
+  .choice input:focus-visible + span {
+    outline: 3px solid var(--herb);
+    outline-offset: 2px;
+  }
+
+  .choice.checkbox span {
+    border-radius: 4px;
+  }
+
+  button#roll {
+    width: 100%;
+    margin-top: 26px;
+    padding: 16px;
+    font-family: 'Kanit', sans-serif;
+    font-weight: 600;
+    font-size: 19px;
+    background: var(--chili);
+    color: var(--paper-light);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 var(--chili-dark);
+  }
+
+  button#roll:active {
+    transform: translateY(3px);
+    box-shadow: 0 2px 0 var(--chili-dark);
+  }
+
+  button#roll:focus-visible {
+    outline: 3px solid var(--herb);
+    outline-offset: 2px;
+  }
+
+  .error-msg {
+    font-size: 13px;
+    color: var(--chili-dark);
+    margin-top: 10px;
+    display: none;
+  }
+
+  /* result ticket */
+  .ticket {
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 6px;
+    padding: 32px 28px;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    box-shadow: 0 18px 0 -8px rgba(0,0,0,0.35);
+    position: relative;
+  }
+
+  .ticket::before {
+    content: "";
+    position: absolute;
+    top: -8px; left: 24px; right: 24px;
+    height: 8px;
+    background: repeating-linear-gradient(90deg, var(--bg-wood) 0 10px, transparent 10px 20px);
+    opacity: 0.5;
+  }
+
+  .ticket-empty {
+    color: var(--ink);
+    opacity: 0.55;
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  .ticket-emoji {
+    font-size: 56px;
+    margin-bottom: 14px;
+  }
+
+  .ticket-name {
+    font-family: 'Kanit', sans-serif;
+    font-weight: 800;
+    font-size: 26px;
+    margin: 0 0 10px;
+  }
+
+  .ticket-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 14px;
+  }
+
+  .ticket-tags span {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--herb);
+    color: var(--paper-light);
+  }
+
+  .ticket-price {
+    font-family: 'Kanit', sans-serif;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--chili-dark);
+  }
+
+  .ticket-count {
+    font-size: 12px;
+    color: var(--ink);
+    opacity: 0.55;
+    margin-top: 16px;
+  }
+
+  footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 12px;
+    color: var(--cream-text-muted);
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ticket.rolling .ticket-emoji { animation: shake 0.35s ease; }
+  }
+  @keyframes shake {
+    0%,100% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    75% { transform: rotate(8deg); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">ทางออกของคนคิดเมนูไม่ออก</p>
+    <h1>วันนี้กินอะไรดี?</h1>
+    <p class="sub">บอกอารมณ์ งบในกระเป๋า แล้วปัดของที่ไม่เอาออก เดี๋ยวสุ่มเมนูให้เอง</p>
+  </header>
+
+  <div class="board">
+    <div class="panel">
+      <div class="field">
+        <label class="field-label" for="mood">อารมณ์อยากกินวันนี้</label>
+        <select id="mood">
+          <option value="any">ไม่เลือก สุ่มได้เลย</option>
+          <option value="สบายๆ">😌 สบายๆ กินง่าย</option>
+          <option value="เผ็ดร้อน">🌶️ เผ็ดร้อน แซ่บ</option>
+          <option value="อิ่มท้อง">🍚 อิ่มท้อง จุกๆ</option>
+          <option value="หวานๆ">🍰 หวานๆ ของว่าง</option>
+          <option value="สุขภาพดี">🥗 สุขภาพดี เบาๆ</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <span class="field-label">งบวันนี้</span>
+        <div class="choice-row" id="budget">
+          <label class="choice">
+            <input type="radio" name="budget" value="1">
+            <span>ประหยัด &lt; 50฿</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="budget" value="2">
+            <span>ปานกลาง 50-100฿</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="budget" value="3">
+            <span>จัดเต็ม &gt; 100฿</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="budget" value="any" checked>
+            <span>เท่าไหร่ก็ได้</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="field-label">ไม่เอา (เลือกได้หลายข้อ)</span>
+        <div class="choice-row" id="exclude">
+          <label class="choice checkbox">
+            <input type="checkbox" value="หมู">
+            <span>หมู</span>
+          </label>
+          <label class="choice checkbox">
+            <input type="checkbox" value="เนื้อวัว">
+            <span>เนื้อวัว</span>
+          </label>
+          <label class="choice checkbox">
+            <input type="checkbox" value="อาหารทะเล">
+            <span>อาหารทะเล</span>
+          </label>
+          <label class="choice checkbox">
+            <input type="checkbox" value="กะทิ">
+            <span>กะทิ</span>
+          </label>
+        </div>
+      </div>
+
+      <button id="roll" type="button">สุ่มเมนู</button>
+      <p class="error-msg" id="errorMsg">ไม่มีเมนูที่ตรงตามเงื่อนไขนี้เลย ลองปรับตัวเลือกดูนะ</p>
+    </div>
+
+    <div class="ticket" id="ticket">
+      <p class="ticket-empty">กดปุ่ม "สุ่มเมนู" แล้วเมนูของวันนี้จะโผล่ตรงนี้</p>
+    </div>
+  </div>
+
+  <footer>ทำด้วย HTML, CSS และ JavaScript ล้วนๆ</footer>
+</div>
+
+<script>
+  var menu = [
+    { name: "ข้าวผัดกะเพราหมู", emoji: "🌶️", price: 1, moods: ["เผ็ดร้อน","อิ่มท้อง"], tags: ["หมู"] },
+    { name: "ต้มยำกุ้ง", emoji: "🍤", price: 2, moods: ["เผ็ดร้อน","สุขภาพดี"], tags: ["อาหารทะเล"] },
+    { name: "ส้มตำไทย", emoji: "🥗", price: 1, moods: ["เผ็ดร้อน","สุขภาพดี"], tags: [] },
+    { name: "ข้าวมันไก่", emoji: "🍗", price: 1, moods: ["สบายๆ","อิ่มท้อง"], tags: [] },
+    { name: "ผัดไทยกุ้งสด", emoji: "🍜", price: 2, moods: ["สบายๆ","อิ่มท้อง"], tags: ["อาหารทะเล"] },
+    { name: "แกงเขียวหวานไก่", emoji: "🍛", price: 2, moods: ["อิ่มท้อง"], tags: ["กะทิ"] },
+    { name: "ข้าวขาหมู", emoji: "🍖", price: 2, moods: ["อิ่มท้อง","สบายๆ"], tags: ["หมู"] },
+    { name: "สุกี้น้ำทะเล", emoji: "🍲", price: 2, moods: ["สุขภาพดี","อิ่มท้อง"], tags: ["อาหารทะเล"] },
+    { name: "ก๋วยเตี๋ยวเนื้อตุ๋น", emoji: "🍜", price: 2, moods: ["สบายๆ","อิ่มท้อง"], tags: ["เนื้อวัว"] },
+    { name: "ยำวุ้นเส้น", emoji: "🥗", price: 1, moods: ["เผ็ดร้อน","สุขภาพดี"], tags: ["อาหารทะเล"] },
+    { name: "ข้าวคลุกกะปิ", emoji: "🍚", price: 1, moods: ["เผ็ดร้อน"], tags: ["อาหารทะเล"] },
+    { name: "สลัดโรล", emoji: "🥙", price: 1, moods: ["สุขภาพดี"], tags: [] },
+    { name: "ข้าวหน้าไก่ทอด", emoji: "🍗", price: 1, moods: ["อิ่มท้อง"], tags: [] },
+    { name: "บะหมี่เกี๊ยวหมูแดง", emoji: "🍜", price: 2, moods: ["สบายๆ","อิ่มท้อง"], tags: ["หมู"] },
+    { name: "เนื้อย่างเกาหลี", emoji: "🥩", price: 3, moods: ["เผ็ดร้อน","อิ่มท้อง"], tags: ["เนื้อวัว"] },
+    { name: "ชาบูหมูสไตล์ญี่ปุ่น", emoji: "🍲", price: 3, moods: ["อิ่มท้อง","สุขภาพดี"], tags: ["หมู"] },
+    { name: "พิซซ่าหน้ารวม", emoji: "🍕", price: 3, moods: ["สบายๆ","อิ่มท้อง"], tags: [] },
+    { name: "สปาเก็ตตี้คาโบนาร่า", emoji: "🍝", price: 2, moods: ["สบายๆ"], tags: ["หมู"] },
+    { name: "ชานมไข่มุก คู่ขนมปังปิ้ง", emoji: "🧋", price: 1, moods: ["หวานๆ"], tags: [] },
+    { name: "บิงซูผลไม้รวม", emoji: "🍧", price: 2, moods: ["หวานๆ","สุขภาพดี"], tags: [] },
+    { name: "เค้กช็อกโกแลตลาวา", emoji: "🍫", price: 2, moods: ["หวานๆ"], tags: [] },
+    { name: "ขนมครกกะทิสด", emoji: "🥥", price: 1, moods: ["หวานๆ"], tags: ["กะทิ"] },
+    { name: "สมูทตี้โบวล์ผลไม้", emoji: "🍓", price: 2, moods: ["สุขภาพดี","หวานๆ"], tags: [] },
+    { name: "สเต็กปลาแซลมอนซอสเลม่อน", emoji: "🐟", price: 3, moods: ["สุขภาพดี","อิ่มท้อง"], tags: ["อาหารทะเล"] }
+  ];
+
+  var priceLabel = { 1: "ประหยัด (ต่ำกว่า 50฿)", 2: "ปานกลาง (50-100฿)", 3: "จัดเต็ม (มากกว่า 100฿)" };
+
+  var rollBtn = document.getElementById("roll");
+  var ticket = document.getElementById("ticket");
+  var errorMsg = document.getElementById("errorMsg");
+
+  function getSelectedBudget() {
+    var radios = document.querySelectorAll('input[name="budget"]');
+    for (var i = 0; i < radios.length; i++) {
+      if (radios[i].checked) return radios[i].value;
+    }
+    return "any";
+  }
+
+  function getExcluded() {
+    var boxes = document.querySelectorAll('#exclude input[type="checkbox"]');
+    var out = [];
+    boxes.forEach(function (b) { if (b.checked) out.push(b.value); });
+    return out;
+  }
+
+  function renderTicket(item) {
+    var tagsHtml = item.moods.map(function (m) { return '<span>' + m + '</span>'; }).join("");
+    ticket.innerHTML =
+      '<div class="ticket-emoji">' + item.emoji + '</div>' +
+      '<p class="ticket-name">' + item.name + '</p>' +
+      '<div class="ticket-tags">' + tagsHtml + '</div>' +
+      '<p class="ticket-price">' + priceLabel[item.price] + '</p>' +
+      '<p class="ticket-count" id="ticketCount"></p>';
+  }
+
+  function roll() {
+    errorMsg.style.display = "none";
+
+    var mood = document.getElementById("mood").value;
+    var budget = getSelectedBudget();
+    var excluded = getExcluded();
+
+    var pool = menu.filter(function (item) {
+      var moodOk = mood === "any" || item.moods.indexOf(mood) !== -1;
+      var budgetOk = budget === "any" || String(item.price) === budget;
+      var excludeOk = excluded.every(function (tag) { return item.tags.indexOf(tag) === -1; });
+      return moodOk && budgetOk && excludeOk;
+    });
+
+    if (pool.length === 0) {
+      errorMsg.style.display = "block";
+      return;
+    }
+
+    var pick = pool[Math.floor(Math.random() * pool.length)];
+
+    ticket.classList.remove("rolling");
+    void ticket.offsetWidth;
+    ticket.classList.add("rolling");
+
+    renderTicket(pick);
+    var countEl = document.getElementById("ticketCount");
+    if (countEl) countEl.textContent = "ตรงเงื่อนไข " + pool.length + " เมนู เลือกมาให้ 1 อย่าง";
+  }
+
+  rollBtn.addEventListener("click", roll);
+</script>
+</body>
+</html>
